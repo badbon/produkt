@@ -1,3 +1,4 @@
+import re
 import time
 import os
 from datetime import datetime
@@ -16,7 +17,7 @@ class Schedule:
                 
         with open(self.filename, "r") as file:
             lines = file.readlines()
-            tasks = [line.strip() for line in lines if line.strip()]
+            tasks = [line.strip() for line in lines if re.match(r'^\d{2}:\d{2}', line.strip())]
             schedule = []
             for task in tasks:
                 start_time, task_detail = task.split(' - ', 1)
