@@ -54,9 +54,9 @@ def main():
         if current_task != task:
             current_time = datetime.now().strftime("%H:%M")
             if current_task[1]:
-                print(f"[{current_time}] [END]   : {current_task[1]}")
-            print(f"[{current_time}] [START] : [{task[0]}] {task[1]}")
-            print(f"[{current_time}] [NEXT]  : [{next_task[0]}] {next_task[1]}")
+                print(f"[{current_time}] [END]: {current_task[1]}")
+            print(f"[{current_time}] [START]: [{task[0]}] {task[1]}")
+            print(f"[{current_time}] [NEXT]: [{next_task[0]}] {next_task[1]}")
             current_task = task
         time.sleep(60)
 
