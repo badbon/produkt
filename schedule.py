@@ -70,8 +70,8 @@ class ScheduleApp:
         task, next_task = self.schedule.get_current_and_next_task()
         current_time = datetime.now().strftime("%H:%M")
         
-        self.current_task_label['text'] = f"[{current_time}] [NOW]: [{task[0]}] {task[1]}"
-        self.next_task_label['text'] = f"[{current_time}] [NEXT]: [{next_task[0]}] {next_task[1]}"
+        self.current_task_label['text'] = f"[NOW]: [{task[0]}] {task[1]}"
+        self.next_task_label['text'] = f"[NEXT]: [{next_task[0]}] {next_task[1]}"
         
         self.root.after(60000, self.update_schedule)  # Update every 60 seconds
 
