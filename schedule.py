@@ -1,7 +1,8 @@
 import re
-import time
 import os
 from datetime import datetime
+import tkinter as tk
+
 
 class Schedule:
     def __init__(self, filename):
@@ -45,20 +46,46 @@ class Schedule:
             self.schedule = self.load_schedule()
             self.last_modified = modified_time
 
+class ScheduleApp:
+    def __init__(self, schedule):
+        self.schedule = schedule
+        self.root = tk.Tk()
+        self.root.title("Produkt - Time Blocking")
+
+        # Window size
+        self.root.geometry("650x180")
+
+        self.root.configure(bg='#2E2E2E')
+        
+        self.current_task_label = tk.Label(self.root, font=('Helvetica', 12), fg='#FFFFFF', bg='#2E2E2E')
+        self.current_task_label.pack(pady=5)
+
+        self.next_task_label = tk.Label(self.root, font=('Helvetica', 12), fg='#FFFFFF', bg='#2E2E2E')
+        self.next_task_label.pack(pady=5)
+
+        self.update_schedule()
+        self.check_for_updates()
+
+    def update_schedule(self):
+        task, next_task = self.schedule.get_current_and_next_task()
+        current_time = datetime.now().strftime("%H:%M")
+        
+        self.current_task_label['text'] = f"[{current_time}] [NOW]: [{task[0]}] {task[1]}"
+        self.next_task_label['text'] = f"[{current_time}] [NEXT]: [{next_task[0]}] {next_task[1]}"
+        
+        self.root.after(60000, self.update_schedule)  # Update every 60 seconds
+
+    def check_for_updates(self):
+        self.schedule.check_for_updates()
+        self.root.after(10000, self.check_for_updates)  # Check for updates every 10 seconds
+
+    def run(self):
+        self.root.mainloop()
+
 def main():
     schedule = Schedule("schedule.txt")
-    current_task = ("", "")
-    while True:
-        schedule.check_for_updates()
-        task, next_task = schedule.get_current_and_next_task()
-        if current_task != task:
-            current_time = datetime.now().strftime("%H:%M")
-            if current_task[1]:
-                print(f"[{current_time}] [END]: {current_task[1]}")
-            print(f"[{current_time}] [START]: [{task[0]}] {task[1]}")
-            print(f"[{current_time}] [NEXT]: [{next_task[0]}] {next_task[1]}")
-            current_task = task
-        time.sleep(60)
+    app = ScheduleApp(schedule)
+    app.run()
 
 if __name__ == "__main__":
     main()
