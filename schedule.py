@@ -79,13 +79,11 @@ class ScheduleApp:
         edit_schedule_button = tk.Button(schedule_frame, text="Edit schedule.txt", command=lambda: os.system(f'start {self.schedule.filename}'), bg='#555555', fg='#FFFFFF', font=('Helvetica', 12))
         edit_schedule_button.pack(padx=10, pady=5)
         # ToDo Section
-        todo_frame = tk.LabelFrame(self.root, text="To-Do List", bg='#2E2E2E', fg='#FFFFFF', font=('Helvetica', 12))
+        todo_frame = tk.LabelFrame(self.root, text="Notes - Diary", bg='#2E2E2E', fg='#FFFFFF', font=('Helvetica', 12))
         todo_frame.pack(fill="both", expand="yes", padx=20, pady=10)
 
         self.todo_list = tk.Listbox(todo_frame, bg='#333333', fg='#FFFFFF', font=('Helvetica', 12))
         self.todo_list.pack(fill="both", expand=True, padx=10, pady=5)
-        self.todo_list.bind('<Double-Button-1>', self.edit_todo)
-
         self.load_todo_list()
 
         edit_todo_button = tk.Button(todo_frame, text="Edit todo.txt", command=lambda: os.system(f'start {self.todo_filename}'), bg='#555555', fg='#FFFFFF', font=('Helvetica', 12))
@@ -106,32 +104,52 @@ class ScheduleApp:
         for line in lines:
             self.todo_list.insert(tk.END, line.strip())
 
+        self.todo_list.bind('<Double-Button-1>', self.edit_todo)
+        self.todo_list.bind('<Delete>', self.delete_todo_item)
+
     def edit_todo(self, event=None):
+        clicked_index = self.todo_list.nearest(event.y)
+        if self.todo_list.selection_includes(clicked_index):
+            selected = True
+            index = clicked_index
+            item = self.todo_list.get(index)
+        else:
+            selected = False
+            index = tk.END
+            item = ""
+
+        def save_edit(event=None):
+            new_item = edit_var.get()
+            if selected:
+                self.todo_list.delete(index)
+                self.todo_list.insert(index, new_item)
+            else:
+                self.todo_list.insert(tk.END, new_item)
+            edit_win.destroy()
+            with open(self.todo_filename, 'w') as file:
+                file.writelines([i + '\n' for i in self.todo_list.get(0, tk.END)])
+
+        edit_win = tk.Toplevel()
+        edit_win.title("Edit Item" if selected else "Add Item")
+        edit_label = tk.Label(edit_win, text="Edit Item:" if selected else "Add Item:")
+        edit_label.pack(padx=10, pady=5)
+        edit_var = tk.StringVar()
+        edit_var.set(item)
+        edit_entry = tk.Entry(edit_win, textvariable=edit_var)
+        edit_entry.pack(padx=10, pady=5)
+        edit_entry.focus_set()
+        edit_entry.icursor(tk.END)
+        save_button = tk.Button(edit_win, text="Save", command=save_edit)
+        save_button.pack(padx=10, pady=5)
+        edit_win.bind('<Return>', save_edit)
+
+    def delete_todo_item(self, event=None):
         selected = self.todo_list.curselection()
         if selected:
             index = selected[0]
-            item = self.todo_list.get(index)
-
-            def save_edit():
-                new_item = edit_var.get()
-                self.todo_list.delete(index)
-                self.todo_list.insert(index, new_item)
-                edit_win.destroy()
-                with open(self.todo_filename, 'w') as file:
-                    file.writelines([i + '\n' for i in self.todo_list.get(0, tk.END)])
-
-            edit_win = tk.Toplevel()
-            edit_win.title("Edit Item")
-            edit_label = tk.Label(edit_win, text="Edit Item:")
-            edit_label.pack(padx=10, pady=5)
-            edit_var = tk.StringVar()
-            edit_var.set(item)
-            edit_entry = tk.Entry(edit_win, textvariable=edit_var)
-            edit_entry.pack(padx=10, pady=5)
-            edit_entry.focus_set()
-            edit_entry.icursor(tk.END)
-            save_button = tk.Button(edit_win, text="Save", command=save_edit)
-            save_button.pack(padx=10, pady=5)
+            self.todo_list.delete(index)
+            with open(self.todo_filename, 'w') as file:
+                file.writelines([i + '\n' for i in self.todo_list.get(0, tk.END)])
             
     def update_schedule(self):
         task, next_task = self.schedule.get_current_and_next_task()
