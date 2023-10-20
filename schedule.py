@@ -66,18 +66,21 @@ class ScheduleApp:
         file.add_command(label="Edit schedule.txt", command=lambda: os.system(f'start {self.schedule.filename}'))
         file.add_command(label="Edit todo.txt", command=lambda: os.system(f'start {self.todo_filename}'))
 
-        # Schedule Section
-        schedule_frame = tk.LabelFrame(self.root, text="Schedule", bg='#2E2E2E', fg='#FFFFFF', font=('Helvetica', 12))
-        schedule_frame.pack(fill="both", expand="yes", padx=20, pady=10)
+        # Schedule Section - Hide if schedule is empty
+        self.schedule_exists = bool(self.schedule.schedule)
+        if self.schedule_exists:
+            schedule_frame = tk.LabelFrame(self.root, text="Schedule", bg='#2E2E2E', fg='#FFFFFF', font=('Helvetica', 12))
+            schedule_frame.pack(fill="both", expand="yes", padx=20, pady=10)
 
-        self.current_task_label = tk.Label(schedule_frame, font=('Helvetica', 12), fg='#FFFFFF', bg='#2E2E2E')
-        self.current_task_label.pack(pady=5)
+            self.current_task_label = tk.Label(schedule_frame, font=('Helvetica', 12), fg='#FFFFFF', bg='#2E2E2E')
+            self.current_task_label.pack(pady=5)
 
-        self.next_task_label = tk.Label(schedule_frame, font=('Helvetica', 12), fg='#FFFFFF', bg='#2E2E2E')
-        self.next_task_label.pack(pady=5)
+            self.next_task_label = tk.Label(schedule_frame, font=('Helvetica', 12), fg='#FFFFFF', bg='#2E2E2E')
+            self.next_task_label.pack(pady=5)
 
-        edit_schedule_button = tk.Button(schedule_frame, text="Edit schedule.txt", command=lambda: os.system(f'start {self.schedule.filename}'), bg='#555555', fg='#FFFFFF', font=('Helvetica', 12))
-        edit_schedule_button.pack(padx=10, pady=5)
+            edit_schedule_button = tk.Button(schedule_frame, text="Edit schedule.txt", command=lambda: os.system(f'start {self.schedule.filename}'), bg='#555555', fg='#FFFFFF', font=('Helvetica', 12))
+            edit_schedule_button.pack(padx=10, pady=5)
+
         # ToDo Section
         todo_frame = tk.LabelFrame(self.root, text="Notes - Diary", bg='#2E2E2E', fg='#FFFFFF', font=('Helvetica', 12))
         todo_frame.pack(fill="both", expand="yes", padx=20, pady=10)
@@ -89,8 +92,9 @@ class ScheduleApp:
         edit_todo_button = tk.Button(todo_frame, text="Edit todo.txt", command=lambda: os.system(f'start {self.todo_filename}'), bg='#555555', fg='#FFFFFF', font=('Helvetica', 12))
         edit_todo_button.pack(padx=10, pady=5)
 
-        self.update_schedule()
-        self.check_for_updates()
+        if self.schedule_exists:
+            self.update_schedule()
+            self.check_for_updates()
 
     def load_todo_list(self):
         if not os.path.exists(self.todo_filename):
