@@ -52,11 +52,10 @@ class ScheduleApp:
         self.schedule = schedule
         self.todo_filename = todo_filename
         self.root = tk.Tk()
-        self.root.title("Produkt - Time Blocking")
+        self.root.title("Produkt - Schedule and Diary Utility")
 
         # Window size
         self.root.geometry("850x600")
-
         self.root.configure(bg='#2E2E2E')
 
         menu = tk.Menu(self.root)
@@ -81,6 +80,7 @@ class ScheduleApp:
 
         self.todo_list = tk.Listbox(todo_frame, bg='#333333', fg='#FFFFFF', font=('Helvetica', 12))
         self.todo_list.pack(fill="both", expand=True, padx=10, pady=5)
+        self.todo_list.bind('<Double-Button-1>', self.edit_todo)  # Binding the double-click event here
 
         self.load_todo_list()
 
@@ -102,7 +102,7 @@ class ScheduleApp:
         for line in lines:
             self.todo_list.insert(tk.END, line.strip())
 
-    def edit_todo(self):
+    def edit_todo(self, event=None):
         selected = self.todo_list.curselection()
         if selected:
             index = selected[0]
@@ -114,7 +114,7 @@ class ScheduleApp:
                 self.todo_list.insert(index, new_item)
                 edit_win.destroy()
                 with open(self.todo_filename, 'w') as file:
-                    file.writelines([item + '\n' for item in self.todo_list.get(0, tk.END)])
+                    file.writelines([i + '\n' for i in self.todo_list.get(0, tk.END)])
 
             edit_win = tk.Toplevel()
             edit_win.title("Edit Item")
@@ -124,9 +124,10 @@ class ScheduleApp:
             edit_var.set(item)
             edit_entry = tk.Entry(edit_win, textvariable=edit_var)
             edit_entry.pack(padx=10, pady=5)
+            edit_entry.focus_set()
+            edit_entry.icursor(tk.END)
             save_button = tk.Button(edit_win, text="Save", command=save_edit)
             save_button.pack(padx=10, pady=5)
-
             
     def update_schedule(self):
         task, next_task = self.schedule.get_current_and_next_task()
