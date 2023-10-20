@@ -109,6 +109,20 @@ class ScheduleApp:
 
     def edit_todo(self, event=None):
         clicked_index = self.todo_list.nearest(event.y)
+
+        # Clear selection first before selecting the clicked item
+        self.todo_list.selection_clear(0, tk.END)
+
+        if self.todo_list.selection_includes(clicked_index):
+            self.todo_list.selection_set(clicked_index)  # Ensure the clicked item is selected
+            selected = True
+            index = clicked_index
+            item = self.todo_list.get(index)
+        else:
+            selected = False
+            index = tk.END
+            item = ""
+
         if self.todo_list.selection_includes(clicked_index):
             selected = True
             index = clicked_index
