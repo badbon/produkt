@@ -1,5 +1,5 @@
 # produkt
-Text file based time-blocking.
-New line is a new entry. Ignores newlines beginning tabs for formatting, so the .txt file can be used both as planning todo lists and actually serving as a dynamic reminder.
+Simplistic Text file based time-blocking, productivity and creative brainstorming utility.
+New line is a new entry. Whole point of this is to allow combined and unconstrained usage of both GUI, and simple .txt based todo, schedule lists and noting.
 
-Made for my own personal use, to replace Trello and Google Docs clutter and simplify workflow.
+Made for my own personal use, to replace Trello / Google Docs clutter and simplify workflow.

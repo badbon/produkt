@@ -63,6 +63,8 @@ class ScheduleApp:
         file = tk.Menu(menu)
         menu.add_cascade(label="File", menu=file)
         file.add_command(label="Exit", command=self.root.destroy)
+        file.add_command(label="Edit schedule.txt", command=lambda: os.system(f'start {self.schedule.filename}'))
+        file.add_command(label="Edit todo.txt", command=lambda: os.system(f'start {self.todo_filename}'))
 
         # Schedule Section
         schedule_frame = tk.LabelFrame(self.root, text="Schedule", bg='#2E2E2E', fg='#FFFFFF', font=('Helvetica', 12))
@@ -74,13 +76,16 @@ class ScheduleApp:
         self.next_task_label = tk.Label(schedule_frame, font=('Helvetica', 12), fg='#FFFFFF', bg='#2E2E2E')
         self.next_task_label.pack(pady=5)
 
+        edit_schedule_button = tk.Button(schedule_frame, text="Edit schedule.txt", command=lambda: os.system(f'start {self.schedule.filename}'), bg='#555555', fg='#FFFFFF', font=('Helvetica', 12))
+        edit_schedule_button.pack(padx=10, pady=5)
+
         # ToDo Section
         todo_frame = tk.LabelFrame(self.root, text="To-Do List", bg='#2E2E2E', fg='#FFFFFF', font=('Helvetica', 12))
         todo_frame.pack(fill="both", expand="yes", padx=20, pady=10)
 
         self.todo_list = tk.Listbox(todo_frame, bg='#333333', fg='#FFFFFF', font=('Helvetica', 12))
         self.todo_list.pack(fill="both", expand=True, padx=10, pady=5)
-        self.todo_list.bind('<Double-Button-1>', self.edit_todo)  # Binding the double-click event here
+        self.todo_list.bind('<Double-Button-1>', self.edit_todo)
 
         self.load_todo_list()
 
@@ -136,11 +141,11 @@ class ScheduleApp:
         self.current_task_label['text'] = f"[NOW]: [{task[0]}] {task[1]}"
         self.next_task_label['text'] = f"[NEXT]: [{next_task[0]}] {next_task[1]}"
         
-        self.root.after(60000, self.update_schedule)  # Update every 60 seconds
+        self.root.after(60000, self.update_schedule)
 
     def check_for_updates(self):
         self.schedule.check_for_updates()
-        self.root.after(10000, self.check_for_updates)  # Check for updates every 10 seconds
+        self.root.after(10000, self.check_for_updates)
 
     def run(self):
         self.root.mainloop()
