@@ -2,6 +2,7 @@ import re
 import os
 from datetime import datetime
 import tkinter as tk
+from tkinter import messagebox
 
 
 class Schedule:
@@ -47,25 +48,86 @@ class Schedule:
             self.last_modified = modified_time
 
 class ScheduleApp:
-    def __init__(self, schedule):
+    def __init__(self, schedule, todo_filename):
         self.schedule = schedule
+        self.todo_filename = todo_filename
         self.root = tk.Tk()
         self.root.title("Produkt - Time Blocking")
 
         # Window size
-        self.root.geometry("650x180")
+        self.root.geometry("850x600")
 
         self.root.configure(bg='#2E2E2E')
-        
-        self.current_task_label = tk.Label(self.root, font=('Helvetica', 12), fg='#FFFFFF', bg='#2E2E2E')
+
+        menu = tk.Menu(self.root)
+        self.root.config(menu=menu)
+        file = tk.Menu(menu)
+        menu.add_cascade(label="File", menu=file)
+        file.add_command(label="Exit", command=self.root.destroy)
+
+        # Schedule Section
+        schedule_frame = tk.LabelFrame(self.root, text="Schedule", bg='#2E2E2E', fg='#FFFFFF', font=('Helvetica', 12))
+        schedule_frame.pack(fill="both", expand="yes", padx=20, pady=10)
+
+        self.current_task_label = tk.Label(schedule_frame, font=('Helvetica', 12), fg='#FFFFFF', bg='#2E2E2E')
         self.current_task_label.pack(pady=5)
 
-        self.next_task_label = tk.Label(self.root, font=('Helvetica', 12), fg='#FFFFFF', bg='#2E2E2E')
+        self.next_task_label = tk.Label(schedule_frame, font=('Helvetica', 12), fg='#FFFFFF', bg='#2E2E2E')
         self.next_task_label.pack(pady=5)
+
+        # ToDo Section
+        todo_frame = tk.LabelFrame(self.root, text="To-Do List", bg='#2E2E2E', fg='#FFFFFF', font=('Helvetica', 12))
+        todo_frame.pack(fill="both", expand="yes", padx=20, pady=10)
+
+        self.todo_list = tk.Listbox(todo_frame, bg='#333333', fg='#FFFFFF', font=('Helvetica', 12))
+        self.todo_list.pack(fill="both", expand=True, padx=10, pady=5)
+
+        self.load_todo_list()
+
+        edit_button = tk.Button(todo_frame, text="Edit", command=self.edit_todo, bg='#555555', fg='#FFFFFF', font=('Helvetica', 12))
+        edit_button.pack(padx=10, pady=5)
 
         self.update_schedule()
         self.check_for_updates()
 
+    def load_todo_list(self):
+        if not os.path.exists(self.todo_filename):
+            with open(self.todo_filename, 'w') as file:
+                file.write("")
+
+        with open(self.todo_filename, 'r') as file:
+            lines = file.readlines()
+
+        self.todo_list.delete(0, tk.END)
+        for line in lines:
+            self.todo_list.insert(tk.END, line.strip())
+
+    def edit_todo(self):
+        selected = self.todo_list.curselection()
+        if selected:
+            index = selected[0]
+            item = self.todo_list.get(index)
+
+            def save_edit():
+                new_item = edit_var.get()
+                self.todo_list.delete(index)
+                self.todo_list.insert(index, new_item)
+                edit_win.destroy()
+                with open(self.todo_filename, 'w') as file:
+                    file.writelines([item + '\n' for item in self.todo_list.get(0, tk.END)])
+
+            edit_win = tk.Toplevel()
+            edit_win.title("Edit Item")
+            edit_label = tk.Label(edit_win, text="Edit Item:")
+            edit_label.pack(padx=10, pady=5)
+            edit_var = tk.StringVar()
+            edit_var.set(item)
+            edit_entry = tk.Entry(edit_win, textvariable=edit_var)
+            edit_entry.pack(padx=10, pady=5)
+            save_button = tk.Button(edit_win, text="Save", command=save_edit)
+            save_button.pack(padx=10, pady=5)
+
+            
     def update_schedule(self):
         task, next_task = self.schedule.get_current_and_next_task()
         current_time = datetime.now().strftime("%H:%M")
@@ -84,7 +146,7 @@ class ScheduleApp:
 
 def main():
     schedule = Schedule("schedule.txt")
-    app = ScheduleApp(schedule)
+    app = ScheduleApp(schedule, "todo.txt")
     app.run()
 
 if __name__ == "__main__":
