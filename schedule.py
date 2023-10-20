@@ -78,7 +78,6 @@ class ScheduleApp:
 
         edit_schedule_button = tk.Button(schedule_frame, text="Edit schedule.txt", command=lambda: os.system(f'start {self.schedule.filename}'), bg='#555555', fg='#FFFFFF', font=('Helvetica', 12))
         edit_schedule_button.pack(padx=10, pady=5)
-
         # ToDo Section
         todo_frame = tk.LabelFrame(self.root, text="To-Do List", bg='#2E2E2E', fg='#FFFFFF', font=('Helvetica', 12))
         todo_frame.pack(fill="both", expand="yes", padx=20, pady=10)
@@ -89,8 +88,8 @@ class ScheduleApp:
 
         self.load_todo_list()
 
-        edit_button = tk.Button(todo_frame, text="Edit", command=self.edit_todo, bg='#555555', fg='#FFFFFF', font=('Helvetica', 12))
-        edit_button.pack(padx=10, pady=5)
+        edit_todo_button = tk.Button(todo_frame, text="Edit todo.txt", command=lambda: os.system(f'start {self.todo_filename}'), bg='#555555', fg='#FFFFFF', font=('Helvetica', 12))
+        edit_todo_button.pack(padx=10, pady=5)
 
         self.update_schedule()
         self.check_for_updates()
